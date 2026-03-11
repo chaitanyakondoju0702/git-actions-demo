@@ -1,4 +1,4 @@
-name: CI Pipeline (Beginner Demo)
+name: Python CI Pipeline
 
 on:
   push:
@@ -7,26 +7,20 @@ on:
     branches: [ main ]
 
 jobs:
-  demo:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Print system info
-        run: |
-          echo "CI is running successfully"
-          echo "Repository cloned"
-          echo "Runner OS:"
-          uname -a
-          echo "Current directory:"
-          pwd
-          echo "Files in repo:"
-          ls -la
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-      - name: Simulate build
-        run: echo "Build step completed"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-      - name: Simulate tests
-        run: echo "All tests passed"
+      - name: Run Python program
+        run: python app.py
