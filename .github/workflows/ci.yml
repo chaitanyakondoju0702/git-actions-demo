@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline with Caching & Artifacts
 
 on:
   push:
@@ -17,11 +17,27 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Cache pip packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install dependencies
         run: pip install -r requirements.txt
 
       - name: Run Tests
-        run: pytest
+        run: |
+          mkdir -p test-reports
+          pytest --junitxml=test-reports/results.xml
+
+      - name: Upload Test Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: python-test-report
+          path: test-reports/results.xml
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
